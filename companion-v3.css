@@ -52,3 +52,6 @@ select option{background:#0c0e10;color:#fff}
 }
 @media(max-width:430px){#v3-root .v3-roll-grid{grid-template-columns:1fr 1fr}}
 @media(prefers-reduced-motion:reduce){#v3-root *,#v3-root *::before,#v3-root *::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+body.v3-secondary-view .utility,body.v3-secondary-view #log{display:none!important}
+body.v3-secondary-view .tabs{margin-bottom:10px}
