@@ -94,3 +94,16 @@ La migration V3 ne doit donc pas jeter le moteur de combat utile ; elle doit rem
 - Desktop : grille 12 colonnes et usage complet de la largeur.
 - iPad : composition proche desktop, cartes adaptées en 6/12 colonnes.
 - iPhone : header condensé, vitaux 3 colonnes, barre de tour horizontale scrollable, cartes empilées, navigation sticky + dock V3.
+
+## Validation finale du 27/09/2026
+
+- Séquençage multiattaque : une autre action de base est bloquée tant que l'action Attaquer n'est pas terminée, sauf Fougue.
+- Fougue : seconde action Attaquer complète de deux frappes validée ; aucune consommation de l'action bonus.
+- Instruction : dernière frappe + action bonus + dé de supériorité validés.
+- Mouvement : toggle sticky réellement câblé, persistant par tour.
+- Actions indisponibles : grisement dérivé de l'économie du tour et des ressources (Second souffle, GWM bonus, Instruction, Riposte, Souffle, Vigueur naine, Inflexible).
+- Navigation secondaire : Combat seul masque les utilitaires de combat sur Social / Inventaire / Journal.
+- Navigation : scroll `auto` retenu pour compatibilité Safari/iOS.
+- Compilation finale : scripts inline + `companion-v3.js` sans erreur de syntaxe.
+
+> Limite du contrôle automatisé : le comportement mécanique et la structure responsive ont été testés en harness et par audit CSS ; le rendu tactile final reste à valider sur un appareil physique iPhone/iPad après propagation GitHub Pages.
