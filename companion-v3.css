@@ -33,6 +33,8 @@ select option{background:#0c0e10;color:#fff}
 #v3-root .v3-check{display:flex!important;align-items:center;gap:9px}#v3-root .v3-check input{width:22px;height:22px}
 #v3-root #v3-note-text{display:block;width:100%;min-height:240px;padding:14px;resize:vertical;margin:8px 0}
 #v3-root .v3-note-label{display:block;color:#ded7cd}#v3-root .v3-preview{white-space:pre-wrap;overflow-wrap:anywhere}
+#v3-root #v3-journal-search{min-width:220px;max-width:360px;background:#090b0d;border:1px solid var(--v3-line);color:var(--v3-text);border-radius:10px;padding:9px 11px}
+#v3-root #v3-journal-search:focus{outline:2px solid color-mix(in srgb,var(--v3-accent) 55%,transparent);outline-offset:1px}
 #v3-root .v3-journal-lines{display:grid;gap:6px;max-height:55vh;overflow:auto}
 #v3-root .v3-journal-line{padding:9px 10px;border:1px solid #2b2f33;background:#090b0d;border-radius:9px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}
 #v3-root .v3-npc{display:flex;align-items:center;gap:12px}#v3-root .v3-npc div{flex:1;min-width:0}#v3-root .v3-npc img{width:64px;height:64px;object-fit:cover;border-radius:10px}
