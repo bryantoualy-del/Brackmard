@@ -61,9 +61,23 @@ function syncEconomy(){let st=window.CompanionV3State?.();if(!st)return;const ec
  }
  let buttons=[];
  if(cfg.id==='samoth')buttons=[...document.querySelectorAll('.cast')].map(b=>[b,b.dataset.spell==='shield'||b.dataset.spell==='absorb'||b.dataset.spell==='counter'?'reaction':st.meta==='Accéléré'&&b.dataset.spell!=='shield'?'bonus':'action']);
- if(cfg.id==='brackmard')buttons=[...document.querySelectorAll('button[onclick]')].map(b=>{let c=b.getAttribute('onclick');let k=/secondWind|startBonusAttack|commandersStrike/.test(c)?'bonus':/reactionAttack|riposte/.test(c)?'reaction':/forgeBreath|dwarvenFortitude|dodgeOnly/.test(c)?'action':null;return[b,k]});
+ if(cfg.id==='brackmard')buttons=[...document.querySelectorAll('button[onclick]')].map(b=>{let c=b.getAttribute('onclick')||'',k=/startAttack\(/.test(c)?'attack':/secondWind\(/.test(c)?'second':/startBonusAttack\(/.test(c)?'gwmBonus':/commandersStrike\(/.test(c)?'command':/reactionAttack\(/.test(c)?'reaction':/riposte\(/.test(c)?'riposte':/forgeBreath\(/.test(c)?'breath':/dwarvenFortitude\(/.test(c)?'dwarf':/dodgeOnly\(/.test(c)?'dodge':/useOne\('indom'/.test(c)?'indom':null;return[b,k]});
  if(cfg.id==='nans'||cfg.id==='rufus')buttons=[...document.querySelectorAll('button[onclick]')].map(b=>{let c=b.getAttribute('onclick');let k=/reaction\(|useCape\(/.test(c)?'reaction':/cunning\(|psiTeleport\(|reconstitute\(|attackKind\('psi2'/.test(c)?'bonus':/attackKind\(|daily\(|whispers\(/.test(c)?'action':null;return[b,k]});
- for(const [b,k] of buttons){if(!k||!b.isConnected)continue;let used=!!eco[k];if(cfg.id==='brackmard'&&k==='action'&&st.extraAction)used=false;if(cfg.id==='samoth'&&st.phase==='dragon'&&k!=='reaction')used=true;if(used)b.disabled=true;else if(b.classList.contains('v3-unavailable'))b.disabled=false;b.classList.toggle('v3-unavailable',used);b.setAttribute('aria-disabled',String(used));}
+ for(const [b,k] of buttons){if(!k||!b.isConnected)continue;let used=!!eco[k];
+  if(cfg.id==='brackmard'){const attackInProgress=String(st.actionUsed||'').includes('Attaquer')&&st.attacksLeft>0;const actionUnavailable=(!!eco.action||attackInProgress)&&!st.extraAction;
+   used=k==='attack'?st.attacksLeft<=0&&!st.extraAction:
+    k==='second'?!st.second||!!eco.bonus:
+    k==='gwmBonus'?!st.gwmBonus||!!eco.bonus:
+    k==='command'?st.sup<=0||!!eco.bonus||(st.attacksLeft<=0&&!st.extraAction):
+    k==='reaction'?!!eco.reaction:
+    k==='riposte'?!!eco.reaction||st.sup<=0:
+    k==='breath'?!st.breath||actionUnavailable:
+    k==='dwarf'?st.hitDice<=0||actionUnavailable:
+    k==='dodge'?actionUnavailable:
+    k==='indom'?!st.indom:false;
+  }
+  if(cfg.id==='samoth'&&st.phase==='dragon'&&k!=='reaction')used=true;
+  if(used)b.disabled=true;else if(b.classList.contains('v3-unavailable'))b.disabled=false;b.classList.toggle('v3-unavailable',used);b.setAttribute('aria-disabled',String(used));}
 }
 const undoAdapter=window.CompanionV3UndoAdapter;
 let transactionStart=null,lastTransaction=null;
