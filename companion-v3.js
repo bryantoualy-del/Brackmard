@@ -21,7 +21,7 @@ function go(id){if(id==='combat')id=cfg.combatTab||'combat';const secondary=['so
  }else{host.querySelectorAll('.v3-panel').forEach(p=>p.hidden=true);let btn=[...nav.querySelectorAll('button')].find(b=>b.dataset.tab===id);btn?.click();}
  host.querySelectorAll('[data-v3-go]').forEach(b=>b.classList.toggle('active',b.dataset.v3Go===id||id===(cfg.combatTab||'combat')&&b.dataset.v3Go==='combat'));
  if(id==='social')renderSocial();if(id==='inventory')renderItems();if(id==='notes')renderNotes();
- window.scrollTo({top:0,behavior:'instant'});
+ window.scrollTo({top:0,behavior:'auto'});
 }
 nav.addEventListener('click',e=>{let b=e.target.closest('[data-v3-tab]');if(b)go(b.dataset.v3Tab);else if(e.target.closest('[data-tab]'))host.querySelectorAll('.v3-panel').forEach(p=>p.hidden=true);});
 host.addEventListener('click',e=>{const b=e.target.closest('[data-v3-go]');if(b)go(b.dataset.v3Go)});
