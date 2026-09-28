@@ -142,7 +142,7 @@ body.fx-gwm-shake .app{animation:gwmScreenShake .34s cubic-bezier(.2,.75,.25,1) 
  .combat-subtabs{gap:5px;margin-bottom:8px}.combat-subtab{min-height:34px;padding:5px 6px;font-size:.69rem}.tactical-card{grid-column:span 4;padding:9px 11px}.tactical-grid{grid-template-columns:1fr;gap:6px}.tactical-grid .item{padding:8px}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;transition:none!important}#fxLayer *{display:none!important}body.surge-active:before{display:none!important}body.fx-gwm-shake .app{animation:none!important}}
-</style><link rel="stylesheet" href="companion-v3.css?v=9"></head>
+</style><link rel="stylesheet" href="companion-v3.css?v=10"></head>
 <body>
 <div id="fxLayer" aria-hidden="true"></div>
 <div id="ribbon" onclick="handleRibbonClick(event)"><div class="rt" id="rtitle">Brack Mard</div><div class="rb" id="rbody"></div><div id="rActions" class="ribbon-actions"></div></div>
@@ -372,4 +372,4 @@ window.CompanionV3State=()=>state;window.CompanionV3Log=msg=>addLog('Jet social 
 window.__CompanionBridge={id:'brackmard',name:'Brack Mard',maxHp:104,read:()=>state,snapshot:()=>window.CompanionV3UndoAdapter.snapshot(),restore:raw=>window.CompanionV3UndoAdapter.restore(raw),inventory:()=>window.CompanionV3?.getItems?.()||[],ac:()=>19,resources:s=>({superiorityDice:s.sup,fougue:s.surge,secondWind:s.second,indomitable:s.indom,breath:s.breath}),statuses:s=>[s.surgeFx?'fougue':null,s.gwm?'cogneur lourd':null].filter(Boolean),custom:s=>({selectedManeuver:document.querySelector('#manSelect')?.value||null,control:{auraUsed:s.auraUsed}}),pending:()=>pendingHit?{roll:document.querySelector('#hitRoll')?.textContent}:null,lastHit:()=>window.__lastAttackHit??null,commands:{damage:applyDamage,heal:applyHealing,setHP:n=>{state.hp=Math.min(MAXHP,n);render()},setTemporaryHP:n=>setTempHp(n,'Manuel'),setResource:(k,v)=>{if(!['sup','surge','second','indom','breath'].includes(k))throw Error('Ressource inconnue');state[k]=Math.min(k==='sup'?5:1,v);render()},changeResource:(k,d)=>window.__CompanionBridge.commands.setResource(k,Math.max(0,state[k]+d)),setRollMode:m=>{if(!['normal','adv','dis'].includes(m))throw Error('Mode indisponible');state.rollMode=m;render()},nextTurn,addInventoryItem:item=>window.CompanionV3.addItem(item),updateInventory:item=>window.CompanionV3.updateItem(item),removeInventoryItem:id=>window.CompanionV3.removeItem(id),applyHitDecision:resolveHitChoice,undo:()=>window.CompanionV3.undo()}};
 </script>
 
-<script src="companion-v3.js?v=14"></script><script src="companion-api.js?v=1"></script></body></html>
+<script src="companion-v3.js?v=15"></script><script src="companion-api.js?v=1"></script></body></html>
