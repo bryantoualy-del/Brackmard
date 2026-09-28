@@ -34,26 +34,21 @@ function roll(label,bonus){
   const dice=b===null?'d20 '+a:'d20 '+a+' / '+b+' → '+n;
   const mode=socialMode==='adv'?' · avantage':socialMode==='dis'?' · désavantage':'';
   const msg=label+' : '+dice+' '+(bonus<0?'−':'+')+' '+Math.abs(bonus)+' = '+(n+bonus)+mode+(n===1?' · 1 naturel':n===20?' · 20 naturel':'');
-  let out=$('#v3-roll');out.textContent=msg;out.hidden=false;try{window.CompanionV3Log?.(msg);}catch{}
+  let out=$('#v3-roll');out.textContent=msg;out.hidden=false;window.CompanionSocialDice?.show({label,dice:b===null?a:[a,b],bonus,total:n+bonus,mode:socialMode});try{window.CompanionV3Log?.(msg);}catch{}
 }
+let socialPane='skills';
 function renderSocial(){
-  let s=cfg.social||{}, abilities=s.abilities||{}, saves=s.saves||{}, skills=s.skills||{}, extra=Array.isArray(s.extra)?s.extra:[];
-  $('#v3-social').innerHTML=
-    '<div class="v3-heading"><div><h2>Social · '+esc(cfg.name)+'</h2><p class="v3-sub">Caractéristiques, jets de sauvegarde, compétences et informations utiles de la fiche actuelle.</p></div>'+
-    '<div class="v3-switch"><button type="button" data-v3-social-mode="normal" class="'+(socialMode==='normal'?'active':'')+'">Normal</button><button type="button" data-v3-social-mode="adv" class="'+(socialMode==='adv'?'active':'')+'">Avantage</button><button type="button" data-v3-social-mode="dis" class="'+(socialMode==='dis'?'active':'')+'">Désavantage</button></div></div>'+
-    '<div class="v3-social-grid">'+
-    [['Caractéristiques',abilities],['Jets de sauvegarde',saves],['Compétences',skills]].map(([title,values])=>
-      '<article class="v3-card"><h3>'+title+'</h3><div class="v3-roll-grid">'+
-      (Object.entries(values).map(([name,bonus])=>
-        '<button type="button" data-v3-roll="'+esc(name)+'" data-bonus="'+Number(bonus)+'">'+esc(name)+(title==='Caractéristiques'&&s.scores?.[name]!==undefined?' '+esc(s.scores[name]):'')+' <b>'+(bonus>=0?'+':'')+bonus+'</b></button>'
-      ).join('')||'<p>Fiche à compléter depuis la source du personnage.</p>')+
-      '</div></article>'
-    ).join('')+
-    (extra.length?'<article class="v3-card v3-extra"><h3>Informations utiles</h3><div class="v3-extra-grid">'+extra.map(([k,v])=>'<div><small>'+esc(k)+'</small><b>'+esc(v)+'</b></div>').join('')+'</div></article>':'')+
-    '</div><div id="v3-roll" class="v3-result" role="status" hidden></div>';
+ const s=cfg.social||{},abilities=s.abilities||{},saves=s.saves||{},skills=s.skills||{},extra=Array.isArray(s.extra)?s.extra:[];
+ const groups={skills:['Compétences',skills],abilities:['Carac. & JdS',abilities],saves:['Jets de sauvegarde',saves]};
+ const list=(values,kind)=>Object.entries(values).map(([name,bonus])=>'<button type="button" data-v3-roll="'+esc((kind==='saves'?'JdS ':'')+name)+'" data-bonus="'+Number(bonus)+'"><span><b>'+esc(name)+'</b>'+(kind==='abilities'&&s.scores?.[name]!==undefined?'<small>Score '+esc(s.scores[name])+'</small>':'')+'</span><strong>'+(bonus>=0?'+':'')+bonus+'</strong></button>').join('')||'<p class="v3-sub">Fiche à compléter depuis la source du personnage.</p>';
+ $('#v3-social').innerHTML='<div class="v3-heading"><div><h2>Social · '+esc(cfg.name)+'</h2><p class="v3-sub">Jets de la fiche et informations utiles.</p></div></div>'+
+ '<nav class="v3-sheet-tabs" aria-label="Profil social"><button type="button" data-v3-sheet="skills" class="'+(socialPane==='skills'?'active':'')+'">Compétences</button><button type="button" data-v3-sheet="abilities" class="'+(socialPane==='abilities'?'active':'')+'">Carac. & JdS</button><button type="button" data-v3-sheet="info" class="'+(socialPane==='info'?'active':'')+'">Infos utiles</button></nav>'+
+ '<div class="v3-switch v3-social-mode"><button type="button" data-v3-social-mode="normal" class="'+(socialMode==='normal'?'active':'')+'">Normal</button><button type="button" data-v3-social-mode="adv" class="'+(socialMode==='adv'?'active':'')+'">Avantage</button><button type="button" data-v3-social-mode="dis" class="'+(socialMode==='dis'?'active':'')+'">Désavantage</button></div>'+
+ (socialPane==='skills'?'<article class="v3-card"><h3>Compétences</h3><div class="v3-roll-grid">'+list(skills,'skills')+'</div></article>':socialPane==='abilities'?'<div class="v3-social-grid"><article class="v3-card"><h3>Caractéristiques</h3><div class="v3-roll-grid">'+list(abilities,'abilities')+'</div></article><article class="v3-card"><h3>Jets de sauvegarde</h3><div class="v3-roll-grid">'+list(saves,'saves')+'</div></article></div>':'<article class="v3-card"><h3>Informations utiles</h3><div class="v3-extra-grid">'+(extra.length?extra.map(([k,v])=>'<div><small>'+esc(k)+'</small><b>'+esc(v)+'</b></div>').join(''):'<div><small>Profil</small><b>Compétences et caractéristiques de la fiche actuelle.</b></div>')+'</div></article>')+
+ '<div id="v3-roll" class="v3-result" role="status" hidden></div>';
 }
 $('#v3-social').addEventListener('click',e=>{
-  const mode=e.target.closest('[data-v3-social-mode]');
+  const pane=e.target.closest('[data-v3-sheet]');if(pane){socialPane=pane.dataset.v3Sheet;renderSocial();return;}const mode=e.target.closest('[data-v3-social-mode]');
   if(mode){socialMode=mode.dataset.v3SocialMode;renderSocial();return;}
   const b=e.target.closest('[data-v3-roll]');
   if(b)roll(b.dataset.v3Roll,Number(b.dataset.bonus));
