@@ -1,0 +1,19 @@
+/* Companion responsive polish v1 */
+*{min-width:0}
+button,input,select,textarea{touch-action:manipulation}
+img{max-width:100%}
+@media(max-width:767px){
+  .app{max-width:100%;overflow-x:hidden;padding-left:8px;padding-right:8px;padding-bottom:calc(112px + env(safe-area-inset-bottom))}
+  button,input,select,textarea{min-height:44px}
+  .tabs{scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+  .tabs button{scroll-snap-align:start}
+  .card,.item,.resource-node{overflow-wrap:anywhere}
+  #v3-root .v3-social-mode{position:sticky;top:max(4px,env(safe-area-inset-top));z-index:62;padding:5px;background:rgba(13,15,18,.95);backdrop-filter:blur(10px)}
+}
+@media(min-width:768px) and (max-width:1100px){
+  .app{max-width:1080px;padding:10px 12px 100px}
+  .turnbar{position:sticky;top:max(4px,env(safe-area-inset-top));z-index:55}
+  .tabs{position:sticky;top:74px;z-index:34;background:rgba(11,13,16,.94);padding:5px 0;backdrop-filter:blur(12px)}
+  .tabs button{flex:1 1 0;min-width:0}
+  #v3-root .v3-roll-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
