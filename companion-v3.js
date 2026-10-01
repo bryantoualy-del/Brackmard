@@ -22,7 +22,7 @@ function go(id){const powers=id==='powers';if(id==='combat'||powers)id=cfg.comba
  host.querySelectorAll('[data-v3-go]').forEach(b=>b.classList.toggle('active',b.dataset.v3Go===id||(['social','inventory'].includes(id)&&b.dataset.v3Go==='social')||(id===(cfg.combatTab||'combat')&&b.dataset.v3Go===(powers?'powers':'combat'))));
  const socialTabs=$('.v3-social-tabs');socialTabs.hidden=!['social','inventory'].includes(id);socialTabs.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.v3SocialGo===id));document.querySelector(`[data-combat-subtab="${powers?'resources':'offense'}"]`)?.click()
  if(id==='social')renderSocial();if(id==='inventory')renderItems();if(id==='notes')renderNotes();
- window.scrollTo({top:0,behavior:'auto'});
+ if(window.matchMedia('(min-width:768px)').matches)window.scrollTo({top:0,behavior:'auto'});
 }
 nav.addEventListener('click',e=>{let b=e.target.closest('[data-v3-tab]');if(b)go(b.dataset.v3Tab);else if(e.target.closest('[data-tab]')){document.body.classList.remove('v3-secondary-view');$('.v3-social-tabs').hidden=true;host.querySelectorAll('.v3-panel').forEach(p=>p.hidden=true);host.querySelectorAll('[data-v3-go]').forEach(x=>x.classList.toggle('active',x.dataset.v3Go==='combat'));nav.querySelectorAll('[data-v3-tab]').forEach(x=>x.classList.remove('active'));}});
 host.addEventListener('click',e=>{const b=e.target.closest('[data-v3-go],[data-v3-social-go]');if(b)go(b.dataset.v3Go||b.dataset.v3SocialGo)});
