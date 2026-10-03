@@ -156,7 +156,22 @@ body.fx-gwm-shake .app{animation:gwmScreenShake .34s cubic-bezier(.2,.75,.25,1) 
 [data-rpg-passive="1"]{display:none!important}
 @media(max-width:520px){#rpg-state-strip{margin:5px 0;padding:6px 8px;gap:7px}#rpg-state-strip .rpglabel{font-size:9px}#rpg-state-strip .rpgstate{font-size:11px}#rpg-mini-status{font-size:9px;min-height:28px;padding:4px 8px}}
 </style>
-<link rel="stylesheet" href="companion-turnbar.css?v=2"></head>
+<link rel="stylesheet" href="companion-turnbar.css?v=2">
+<style id="next-turn-gold-v1">
+/* Tour suivant — accent doré commun aux Compagnons */
+.next{
+  background:linear-gradient(180deg,#f0c36d 0%,#e1a640 52%,#b97817 100%)!important;
+  border-color:#ffd77f!important;
+  color:#1b1207!important;
+  font-weight:900!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 0 14px rgba(225,166,64,.20)!important;
+}
+.next:hover,.next:focus-visible{
+  filter:brightness(1.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 0 18px rgba(225,166,64,.32)!important;
+}
+</style>
+</head>
 <body>
 <div id="fxLayer" aria-hidden="true"></div>
 <div id="ribbon" onclick="handleRibbonClick(event)"><div class="rt" id="rtitle">Brack Mard</div><div class="rb" id="rbody"></div><div id="rActions" class="ribbon-actions"></div></div>
