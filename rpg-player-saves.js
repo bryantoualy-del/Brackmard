@@ -10,7 +10,7 @@
  const persist=()=>localStorage.setItem(key,JSON.stringify(ledger));
  const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'');
  const die=n=>{const x=new Uint32Array(1),limit=Math.floor(4294967296/n)*n;do{crypto.getRandomValues(x)}while(x[0]>=limit);return x[0]%n+1};
- const online=()=>window.RPGConnect?.getStatus().connected;
+ const online=()=>window.RPGConnect?.getStatus().controlled;
  function send(item){if(!item.cancelled&&item.result&&item.finalized&&!item.ack&&online())api.emitLocal('player-save:result',item.result,item.request.requestId+':result')}
  function finish(item,result){if(item.finalized)return;item.result={requestId:item.request.requestId,combatId:item.request.combatId,targetId:item.request.targetId,ability:item.request.ability,dc:item.request.dc,...result};item.finalized=true;persist();send(item);if(dialog.open)dialog.close();current=null;queueMicrotask(next)}
  function next(){if(current)return;const item=Object.values(ledger).find(x=>!x.cancelled&&!x.finalized&&x.request.combatId===currentCombatId);if(!item)return;current=item;if(item.firstRoll&&item.indomitableDecision==null)return offerIndomitable(item);if(item.firstRoll&&item.indomitableDecision==='use')return reroll(item);if(item.result)return finish(item,item.result);const q=item.request,keys=new Set((q.conditions||[]).map(c=>norm(c.name)));
@@ -39,7 +39,7 @@
   if(indom.open)indom.close();if(dialog.open)dialog.close();const r=item.result;if(!window.CompanionDiceEngine)await new Promise(resolve=>window.addEventListener('companiondice:ready',resolve,{once:true}));await window.CompanionDiceEngine.roll({label:'Inflexible · JdS '+r.ability,verdict:r.success?'JET RÉUSSI':'JET RATÉ',rolls:r.rolls,chosen:r.natural,total:r.total,detail:'Nouveau résultat obligatoire · '+r.total+' / DD '+r.dc,mode:r.mode});if(typeof addLog==='function')addLog('Inflexible · 1 utilisation · '+r.total+' / DD '+r.dc);if(typeof ribbon==='function')ribbon('INFLEXIBLE · RÉSULTAT DÉFINITIF',r.total+' / DD '+r.dc+' · 1 utilisation consommée · conséquences Encounter en attente');finish(item,r);
  }
  indom.querySelector('[data-indom-use]').onclick=()=>{const item=current;if(!item||item.indomitableDecision!=null)return;if(bridge.read().indom<=0)return passIndomitable();item.indomitableDecision='use';persist();reroll(item)};indom.querySelector('[data-indom-pass]').onclick=passIndomitable;
- document.addEventListener('click',e=>{if(!current?.firstRoll||current.finalized||e.target.closest('#brackIndomitablePopup'))return;const button=e.target.closest('button');if(button&&/repos|rest|undo|reset|fin de tour|inflexible/i.test(button.id+' '+button.textContent)){e.preventDefault();e.stopImmediatePropagation();}},true);
+ document.addEventListener('click',e=>{if(e.target.closest?.('[data-resolution-controls]'))return;if(!current?.firstRoll||current.finalized||e.target.closest('#brackIndomitablePopup'))return;const button=e.target.closest('button');if(button&&/repos|rest|undo|reset|fin de tour|inflexible/i.test(button.id+' '+button.textContent)){e.preventDefault();e.stopImmediatePropagation();}},true);
 
  function receive(type,q){if(type==='player-save:ack'){if(ledger[q.requestId]){ledger[q.requestId].ack=true;persist()}return true}if(type!=='player-save:request'||!q.requestId||!q.combatId||!q.targetId||!['FOR','DEX','CON','INT','SAG','CHA'].includes(q.ability)||!Number.isFinite(q.dc))return false;
   const old=ledger[q.requestId];if(old){if(old.firstRoll&&!old.finalized){next();return true}if(old.result&&!old.finalized&&current!==old)finish(old,old.result);else{send(old);next()}return true}
@@ -48,5 +48,6 @@
  function restore(payload){if(current&&current.request.combatId!==payload.combatId){current=null;if(dialog.open)dialog.close()}currentCombatId=payload.combatId;for(const q of payload.playerSavePending||[])receive('player-save:request',q);for(const item of Object.values(ledger))if(item.request.combatId===payload.combatId){if(item.firstRoll&&!item.finalized){next();continue}if(item.result&&!item.finalized&&current!==item)finish(item,item.result);else send(item)}next()}
  setInterval(()=>{for(const item of Object.values(ledger))send(item)},3000);
  window.RPGPlayerSaves={cancelRequests:ids=>{for(const item of Object.values(ledger))if(ids.includes(item.request.requestId)){item.cancelled=true;item.ack=true;item.finalized=true;if(current===item){current=null;if(dialog.open)dialog.close();if(indom.open)indom.close()}}persist()},receive,restore,pending:()=>Object.values(ledger).filter(x=>!x.result).map(x=>x.request)};
+window.RPGResolution.register('RPGPlayerSaves',{detach:()=>{const old=JSON.parse(JSON.stringify(Object.values(ledger)));window.RPGPlayerSaves.cancelRequests(Object.values(ledger).map(x=>x.request.requestId));return old;}});
 })();
 
