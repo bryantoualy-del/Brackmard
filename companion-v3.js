@@ -90,7 +90,7 @@ function syncEconomy(){let st=window.CompanionV3State?.();if(!st)return;const ec
  if(cfg.id==='nans'||cfg.id==='rufus')buttons=[...document.querySelectorAll('button[onclick]')].map(b=>{let c=b.getAttribute('onclick');let k=/reaction\(|useCape\(/.test(c)?'reaction':/cunning\(|psiTeleport\(|reconstitute\(|attackKind\('psi2'/.test(c)?'bonus':/attackKind\(|daily\(|whispers\(/.test(c)?'action':null;return[b,k]});
  for(const [b,k] of buttons){if(!k||!b.isConnected)continue;let used=!!eco[k];
   if(cfg.id==='brackmard'){const attackInProgress=String(st.actionUsed||'').includes('Attaquer')&&st.attacksLeft>0;const actionUnavailable=(!!eco.action||attackInProgress)&&!st.extraAction;
-   used=k==='attack'?st.attacksLeft<=0&&!st.extraAction:
+   used=k==='attack'?st.attacksLeft<=0&&!st.extraAction&&!window.brackHasteAvailable?.():
     k==='second'?!st.second||!!eco.bonus:
     k==='gwmBonus'?!st.gwmBonus||!!eco.bonus:
     k==='command'?st.sup<=0||!!eco.bonus||(st.attacksLeft<=0&&!st.extraAction):
