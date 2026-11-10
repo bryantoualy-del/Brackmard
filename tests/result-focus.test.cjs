@@ -91,3 +91,14 @@ test('structured actual dice, typed mixed damage, one display per event, social 
  assert.equal(card.children[2].children[0].children[1].textContent,'24');
  assert.equal(card.children[2].children[1].children[1].textContent,'11');
 });
+
+test('Brack PyroMerlin uses real dice for one result and leaves journal writes intact',()=>{
+ const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+ const scripts=[...html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/gi)].filter(x=>!x[1].includes('src=')&&!x[1].includes('module'));
+ for(const [,attrs,code] of scripts)new vm.Script(code,{filename:'Brack inline script'+attrs});
+ assert.match(html,/naturalRolls:\[a,b\],mode/);
+ assert.match(html,/showStructured\?\.\(structured\)/);
+ assert.match(html,/addLog\(title\+' • '\+dmg/);
+ assert.match(html,/damage.*?dice:a\.rolls/s);
+ assert.match(html,/type:'feu'.*?dice:f\.rolls/s);
+});
