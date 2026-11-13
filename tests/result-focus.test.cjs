@@ -192,3 +192,18 @@ test('all D&D skill results, including Histoire, are excluded from the combat po
  }
  assert.equal(isSocial('Trait de feu'),false);
 });
+
+test('Brack level 11: three attacks, eleven hit dice and safe migration of zero dice',()=>{
+ const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+ assert.match(html,/Guerrier 11/);
+ assert.match(html,/attacksLeft:3,attacksMax:3/);
+ assert.match(html,/hitDice:11/);
+ assert.match(html,/id="attacksText">3 frappes disponibles/);
+ assert.match(html,/Number\(s\.hitDice\?\?10\)\+1/);
+ const migrated=(old)=>Math.min(11,Math.max(0,Number(old??10)+1));
+ assert.equal(migrated(0),1);
+ assert.equal(migrated(9),10);
+ assert.equal(migrated(10),11);
+ const scripts=[...html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/gi)].filter(x=>!x[1].includes('src=')&&!x[1].includes('module'));
+ for(const [,attrs,code] of scripts)new vm.Script(code,{filename:'Brack level 11'+attrs});
+});
