@@ -28,6 +28,7 @@
   if(b.id==='kentaro'&&key!=='movement')s[key+'Used']=!value;
   if(b.id==='brackmard'&&key!=='movement')s[key+'Used']=value?'':'Correction MJ';
   if(key==='action'&&value){if(b.id==='kentaro')Object.assign(s,{attackCount:0,actionKind:'',actionLabel:'',eldritchCount:0,eldritchRun:null});if(b.id==='nans')s.attacksLeft=2;if(b.id==='brackmard'){s.attacksLeft=3;s.attacksMax=3;}if(b.id==='zephyr')s.attackCount=0;}
+  if(key==='action'&&!value&&b.id==='brackmard')s.attacksLeft=0;
   if(key==='bonus'&&value){if(Object.hasOwn(s,'bonusSpell'))s.bonusSpell=false;if(Object.hasOwn(s,'bonusLabel'))s.bonusLabel='';}
  }
  }
