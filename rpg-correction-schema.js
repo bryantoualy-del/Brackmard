@@ -4,7 +4,7 @@
  const labels={slots:'Emplacements de pacte',curseReady:'Malédiction',biteReady:'Morsure',stoneReady:'Pierre',rayStepReady:'Pas de rayon',superiorityDice:'Dés de supériorité',fougue:'Fougue',secondWind:'Second souffle',indomitable:'Indomptable',breath:'Souffle',hitDice:'Dés de vie',sorceryPoints:'Points de sorcellerie',featPoints:'Points de métamagie',wings:'Ailes',staffCharges:'Charges du bâton',cureFree:'Soins gratuits',flame:'Flamme',vial:'Fiole',rages:'Rages',horn:'Charges du cor',voltoEnergy:'Touches chargées Volto',voltoStored:'Charges stockées dans la fiole',barkReady:'Écorce',capeReady:'Parade de vent',ancReady:'Appel des ancêtres',psiDie:'Taille du dé psionique',lucky:'Chance',hexCharges:'Charges Hexen',psiReconstitutionReady:'Reconstitution psionique',ravenShadow:'Ombre du corbeau',pilgrim:'Pèlerin',judgment:'Jugement différé',lastBreath:'Dernier souffle',fireBladeReady:'Lame de feu',visionUses:'Visions utilisées',woundReady:'Blessure',invisibilityReady:'Invisibilité',layOnHands:'Réserve de soins',channel:'Conduit divin',arrows:'Flèches',binahChromatic:'Charges chromatiques',binahWall:'Mur prismatique',sense:'Sens divin',decree:'Décrets',anchor:'Ancre sacrée',exhaust:'Épuisement'};
  const maps={
  kentaro:{slots:['slots',2],curseReady:['curseReady',1,'bool'],biteReady:['biteReady',1,'bool'],stoneReady:['stoneReady',1,'bool'],rayStepReady:['rayStepReady',1,'bool']},
- brackmard:{superiorityDice:['sup',5],fougue:['surge',1],secondWind:['second',1],indomitable:['indom',1],breath:['breath',1],hitDice:['hitDice',10]},
+ brackmard:{superiorityDice:['sup',5],fougue:['surge',1],secondWind:['second',1],indomitable:['indom',1],breath:['breath',1],hitDice:['hitDice',11]},
  samoth:{sorceryPoints:['sp',10],featPoints:['featSp',2],wings:['wings',4],staffCharges:['staff',8],cureFree:['cureFree',1],flame:['flame',1],vial:['vial',1],hitDice:['hitDice',10]},
  nans:{rages:['rages',4],horn:['horn',5],voltoEnergy:['hits',6],voltoStored:['storedCount',5],barkReady:['barkReady',1,'bool'],capeReady:['capeReady',1,'bool'],ancReady:['ancReady',1,'bool'],exhaust:['exhaust',6]},
  rufus:{psiDie:['psiDie',8],lucky:['lucky',3],hexCharges:['hexCharges',5],psiReconstitutionReady:['psiReconstitutionReady',1,'bool'],ravenShadow:['linceul.ravenShadow',2],pilgrim:['linceul.pilgrim',1,'bool'],judgment:['linceul.judgment',1,'bool'],lastBreath:['linceul.lastBreath',1,'bool'],fireBladeReady:['fireBlade.ready',1,'bool'],visionUses:['vision.uses',100],woundReady:['woundReady',1,'bool'],invisibilityReady:['invisibilityReady',1,'bool']},
@@ -27,7 +27,7 @@
   if(key==='movement')s.rpgMovementAvailable=value;
   if(b.id==='kentaro'&&key!=='movement')s[key+'Used']=!value;
   if(b.id==='brackmard'&&key!=='movement')s[key+'Used']=value?'':'Correction MJ';
-  if(key==='action'&&value){if(b.id==='kentaro')Object.assign(s,{attackCount:0,actionKind:'',actionLabel:'',eldritchCount:0,eldritchRun:null});if(['nans','brackmard'].includes(b.id))s.attacksLeft=2;if(b.id==='zephyr')s.attackCount=0;}
+  if(key==='action'&&value){if(b.id==='kentaro')Object.assign(s,{attackCount:0,actionKind:'',actionLabel:'',eldritchCount:0,eldritchRun:null});if(b.id==='nans')s.attacksLeft=2;if(b.id==='brackmard'){s.attacksLeft=3;s.attacksMax=3;}if(b.id==='zephyr')s.attackCount=0;}
   if(key==='bonus'&&value){if(Object.hasOwn(s,'bonusSpell'))s.bonusSpell=false;if(Object.hasOwn(s,'bonusLabel'))s.bonusLabel='';}
  }
  }
