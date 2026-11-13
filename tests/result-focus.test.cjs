@@ -222,6 +222,11 @@ test('RPG Connect manual correction returns three Brack attacks, not two',()=>{
  assert.equal(state.used.action,false);
  assert.equal(state.actionUsed,'');
  assert.equal(state.surge,0,'manual action correction does not return Fougue');
+ schema.apply(bridge,'action',false);
+ assert.equal(state.attacksLeft,0,'spending Action also cancels remaining strikes');
+ assert.equal(state.used.action,true);
+ schema.apply(bridge,'action',true);
+ assert.equal(state.attacksLeft,3,'the action can be restored repeatedly');
  const other={used:{action:true},attacksLeft:0};
  schema.apply({id:'nans',read:()=>other},'action',true);
  assert.equal(other.attacksLeft,2,'Nans retains its two-attack rule');
