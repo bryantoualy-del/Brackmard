@@ -34,11 +34,13 @@ try{
   const restored=await page.evaluate(()=>{const s=window.__CompanionBridge.read();return{attacks:s.attacksLeft,max:s.attacksMax,used:s.used.action}});
   assert.deepEqual(restored,{attacks:3,max:3,used:false},'click Action must restore all 3 attacks');
   await actionCell.click();
-  const manuallySpent=await page.evaluate(()=>{const s=window.__CompanionBridge.read();return{attacks:s.attacksLeft,used:s.used.action}});
-  assert.deepEqual(manuallySpent,{attacks:0,used:true},'click Action again must mark it spent');
+  const available=await page.evaluate(()=>{const s=window.__CompanionBridge.read();return{attacks:s.attacksLeft,used:s.used.action}});
+  assert.deepEqual(available,{attacks:3,used:false},'an available action remains unchanged when tapped');
+  await page.evaluate(()=>{for(let i=0;i<3;i++)startAttack()});
+  assert.equal(await page.evaluate(()=>window.__CompanionBridge.read().attacksLeft),0);
   await actionCell.click();
-  assert.equal(await page.evaluate(()=>window.__CompanionBridge.read().attacksLeft),3);
-  await page.evaluate(()=>{const s=window.__CompanionBridge.read();for(let i=0;i<3;i++)startAttack();actionSurge();startAttack()});
+  assert.equal(await page.evaluate(()=>window.__CompanionBridge.read().attacksLeft),3,'repeated restoration must again grant 3 attacks');
+  await page.evaluate(()=>{for(let i=0;i<3;i++)startAttack();actionSurge();startAttack()});
   const surged=await page.evaluate(()=>{const s=window.__CompanionBridge.read();return{attacks:s.attacksLeft,extra:s.extraAction,surge:s.surge,max:s.attacksMax}});
   assert.deepEqual(surged,{attacks:2,extra:false,surge:0,max:6},'Fougue grants a separate action of 3 attacks');
   await page.evaluate(()=>window.__CompanionBridge.commands.nextTurn());
