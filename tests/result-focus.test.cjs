@@ -208,37 +208,21 @@ test('Brack level 11: three attacks, eleven hit dice and safe migration of zero 
  for(const [,attrs,code] of scripts)new vm.Script(code,{filename:'Brack level 11'+attrs});
 });
 
-test('Brack Action cell toggles 0 ↔ 3 attacks without consuming Fougue',()=>{
- const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
- assert.match(html,/id="ecoAction"[^>]*onclick="toggleActionEconomy\(\)"/);
- const match=html.match(/function toggleActionEconomy\(\)\{[\s\S]*?\n\}\nfunction consumeAction/);
- assert.ok(match,'manual economy callback must exist');
- const code=match[0].replace(/\nfunction consumeAction$/,'');
- const log=[],ribbons=[];
- const context={
-   state:{used:{action:true},attacksLeft:0,attacksMax:6,actionUsed:'Attaquer',extraAction:false,surge:0},
-   pendingHit:null,
-   document:{querySelector:()=>null},
-   render:()=>{},
-   addLog:value=>log.push(value),
-   ribbon:(title,message)=>ribbons.push(title+': '+message)
- };
- vm.runInNewContext(code,context);
- assert.equal(context.toggleActionEconomy(),true);
- assert.equal(context.state.attacksLeft,3);
- assert.equal(context.state.attacksMax,3);
- assert.equal(context.state.used.action,false);
- assert.equal(context.state.surge,0,'manual correction never restores Fougue');
- assert.equal(context.toggleActionEconomy(),true);
- assert.equal(context.state.attacksLeft,0);
- assert.equal(context.state.used.action,true);
- context.pendingHit={attackId:'pending'};
- assert.equal(context.toggleActionEconomy(),false,'pending hit cannot be overwritten');
- assert.equal(context.state.attacksLeft,0);
- context.pendingHit=null;
- context.state.extraAction=true;
- assert.equal(context.toggleActionEconomy(),false,'Fougue is independent of manual action correction');
- assert.equal(context.state.attacksLeft,0);
- assert.equal(log.length,2);
- assert.equal(ribbons.length,2);
+test('RPG Connect manual correction returns three Brack attacks, not two',()=>{
+ const source=fs.readFileSync(path.join(root,'rpg-correction-schema.js'),'utf8'),sandbox={};
+ vm.runInNewContext(source,sandbox);
+ const schema=sandbox.RPGCorrectionSchema;
+ const state={used:{action:true,bonus:false,reaction:false},actionUsed:'Attaquer',attacksLeft:0,attacksMax:6,surge:0,hitDice:11};
+ const bridge={id:'brackmard',read:()=>state};
+ assert.equal(schema.valid('brackmard','hitDice',11),true);
+ assert.equal(schema.valid('brackmard','hitDice',12),false);
+ schema.apply(bridge,'action',true);
+ assert.equal(state.attacksLeft,3);
+ assert.equal(state.attacksMax,3);
+ assert.equal(state.used.action,false);
+ assert.equal(state.actionUsed,'');
+ assert.equal(state.surge,0,'manual action correction does not return Fougue');
+ const other={used:{action:true},attacksLeft:0};
+ schema.apply({id:'nans',read:()=>other},'action',true);
+ assert.equal(other.attacksLeft,2,'Nans retains its two-attack rule');
 });
