@@ -29,7 +29,7 @@ try{
   });
   const spent=await page.evaluate(()=>{const s=window.__CompanionBridge.read();return{attacks:s.attacksLeft,used:s.used.action}});
   assert.deepEqual(spent,{attacks:0,used:true},'three weapon attacks must consume the action');
-  const actionCell=page.locator('#cc-turnbar-standard .cc-turn-action');
+  const actionCell=page.locator(width>=700?'#cc-turnbar-standard .cc-turn-action':'#ecoAction');
   await actionCell.click();
   const restored=await page.evaluate(()=>{const s=window.__CompanionBridge.read();return{attacks:s.attacksLeft,max:s.attacksMax,used:s.used.action}});
   assert.deepEqual(restored,{attacks:3,max:3,used:false},'click Action must restore all 3 attacks');
