@@ -207,3 +207,27 @@ test('Brack level 11: three attacks, eleven hit dice and safe migration of zero 
  const scripts=[...html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/gi)].filter(x=>!x[1].includes('src=')&&!x[1].includes('module'));
  for(const [,attrs,code] of scripts)new vm.Script(code,{filename:'Brack level 11'+attrs});
 });
+
+test('RPG Connect manual correction returns three Brack attacks, not two',()=>{
+ const source=fs.readFileSync(path.join(root,'rpg-correction-schema.js'),'utf8'),sandbox={};
+ vm.runInNewContext(source,sandbox);
+ const schema=sandbox.RPGCorrectionSchema;
+ const state={used:{action:true,bonus:false,reaction:false},actionUsed:'Attaquer',attacksLeft:0,attacksMax:6,surge:0,hitDice:11};
+ const bridge={id:'brackmard',read:()=>state};
+ assert.equal(schema.valid('brackmard','hitDice',11),true);
+ assert.equal(schema.valid('brackmard','hitDice',12),false);
+ schema.apply(bridge,'action',true);
+ assert.equal(state.attacksLeft,3);
+ assert.equal(state.attacksMax,3);
+ assert.equal(state.used.action,false);
+ assert.equal(state.actionUsed,'');
+ assert.equal(state.surge,0,'manual action correction does not return Fougue');
+ schema.apply(bridge,'action',false);
+ assert.equal(state.attacksLeft,0,'spending Action also cancels remaining strikes');
+ assert.equal(state.used.action,true);
+ schema.apply(bridge,'action',true);
+ assert.equal(state.attacksLeft,3,'the action can be restored repeatedly');
+ const other={used:{action:true},attacksLeft:0};
+ schema.apply({id:'nans',read:()=>other},'action',true);
+ assert.equal(other.attacksLeft,2,'Nans retains its two-attack rule');
+});
