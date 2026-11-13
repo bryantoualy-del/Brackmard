@@ -252,7 +252,7 @@ nav.tabs{display:flex!important;align-items:center!important;gap:5px!important;m
 
 <section class="turnbar" id="turnbar" aria-label="Économie du tour">
   <div class="turnmark"><b>Tour <span id="turnNo">1</span></b><small>Round <span id="roundNo">1</span></small></div>
-  <div id="ecoAction" class="eco"><b>Action</b><span>disponible</span></div>
+  <div id="ecoAction" class="eco" role="button" tabindex="0" aria-label="Action : correction manuelle des attaques" title="Cliquer pour dépenser l’action, recliquer pour restaurer les trois attaques" onclick="toggleActionEconomy()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleActionEconomy()}"><b>Action</b><span>disponible</span></div>
   <div id="ecoBonus" class="eco"><b>Bonus</b><span>disponible</span></div>
   <div id="ecoReaction" class="eco"><b>Réaction</b><span>disponible</span></div>
   <button id="v3-movement" type="button">Mouvement · 7,5 m</button>
@@ -490,6 +490,31 @@ function updateDamagePreview(){let field=$('incomingDamage'),box=$('damagePrevie
 function quickIncomingDamage(amount){let field=$('incomingDamage');if(!field)return;field.value=amount;updateDamagePreview()}
 function applyIncomingDamage(){let field=$('incomingDamage'),box=$('damagePreview'),amount=Math.max(0,Number(field?.value)||0);if(!amount)return;let beforeHp=state.hp,beforeTemp=state.tempHp,source=state.tempSource;applyDamage(amount);let absorbed=beforeTemp-state.tempHp,hpLoss=beforeHp-state.hp;if(field)field.value='';if(box){box.className='damage-preview result';box.innerHTML='<strong>Appliqué :</strong> '+absorbed+' PV temp absorbés'+(absorbed&&source?' ('+source+')':'')+' · '+hpLoss+' PV perdus · '+state.hp+'/'+(state.maxHp||MAXHP)+' PV restants.'}}function changeSup(d){let before=state.sup;state.sup=Math.max(0,Math.min(5,state.sup+d));if(d<0&&state.sup<before)triggerFX('superiority');render()}
 function spendSup(){if(state.sup<=0){ribbon('Ressource épuisée','Plus aucun dé de supériorité.');return null}state.sup--;let d=rnd(10);triggerFX('superiority');render();return d}
+// L'économie de la barre de tour est une correction manuelle, distincte de Fougue et de Hâte.
+function toggleActionEconomy(){
+  if(pendingHit||document.querySelector('#rActions.show')){
+    ribbon('Action','Termine d’abord la résolution de la frappe avant de corriger l’action.');
+    return false;
+  }
+  if(state.extraAction){
+    ribbon('Action','Fougue est disponible : dépense d’abord cette action supplémentaire ou termine le tour.');
+    return false;
+  }
+  const restore=!!state.used.action||state.attacksLeft<=0;
+  if(restore){
+    state.used.action=false;
+    state.actionUsed='';
+    state.attacksLeft=3;
+    state.attacksMax=3;
+  }else{
+    state.used.action=true;
+    state.actionUsed='Action utilisée (manuel)';
+    state.attacksLeft=0;
+  }
+  render();
+  addLog(restore?'Correction manuelle : action restaurée, 3 frappes disponibles.':'Correction manuelle : action marquée utilisée, 0 frappe disponible.');
+  return true;
+}
 function consumeAction(label='Action'){let attackInProgress=state.actionUsed.includes('Attaquer')&&state.attacksLeft>0;if(!state.used.action&&!attackInProgress){state.used.action=true;state.attacksLeft=0;markAction(label);triggerFX('action');render();return true}if(state.extraAction){state.extraAction=false;markAction(label+' (Fougue)');triggerFX('action');render();addLog('Action supplémentaire utilisée : '+label);return true}ribbon(label,'Plus aucune action disponible ce tour.');return false}
 function setRollMode(m){if(!['normal','adv','dis'].includes(m))m='normal';state.rollMode=m;render();addLog('Mode de jet : '+(m==='adv'?'avantage':m==='dis'?'désavantage':'normal'))}function rollD20(label='d20',weapon=false){const mode=weapon?(window.RPGHealth?.weaponRollMode(state.rollMode)||state.rollMode):state.rollMode;let manual=$('manualRoll');if(manual&&manual.value!==''){let v=Math.max(1,Math.min(20,parseInt(manual.value)||1));return{d20:v,text:label+' manuel '+v,naturalRolls:[v],mode:'manual'}}let a=rnd(20);if(mode==='adv'||mode==='dis'){let b=rnd(20),v=mode==='adv'?Math.max(a,b):Math.min(a,b);return{d20:v,text:label+' '+a+' / '+b+' → '+v+(state.rollMode==='adv'?' · avantage':' · désavantage'),naturalRolls:[a,b],mode}}return{d20:a,text:label+' '+a,naturalRolls:[a],mode:'normal'}}function toggleGWM(){state.gwm=!state.gwm;render();if(state.gwm)ribbon('COGNEUR LOURD','Mode puissance activé\n−5 au jet • +10 dégâts');addLog('Cogneur lourd '+(state.gwm?'activé':'désactivé'))}
 function actionSurge(){if(!state.surge){ribbon('Fougue','Déjà utilisée.');return}state.surge=0;state.surgeFx=true;state.extraAction=true;triggerFX('surge');render();ribbon('FOUGUE','1 action supplémentaire disponible ce tour.\nAucune action ni action bonus consommée.');addLog('Fougue : +1 action supplémentaire, sans coût d’action.')}
